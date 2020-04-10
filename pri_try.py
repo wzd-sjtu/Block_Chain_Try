@@ -69,7 +69,6 @@ class Miner:
         block.tranData = tranData
         block.difficulty, block.hash, block.nonce = self.generate(previousHash, tranData,block.time)
         endTime = time()
-
         return block, endTime - beginTime
 
     #  没有动用self里面的数据，所以使用静态方法
@@ -81,9 +80,9 @@ class Miner:
         hash = hashlib.sha256(tmp).hexdigest()
         #  若得到的16进制数字最后一位部位0   则继续进行挖矿
         #  难度用挖矿的次数来表示  这也是一种工作量证明
-        while hash[-1] != '0':
+        while hash[0] != '0' or hash[1]!='0' or hash[2]!='0':
             difficulty += 1
-            nonce = random.randrange(0, 99999)
+            nonce=random.randrange(0,99999)
             tmp = f'{previousHash}{nonce}{tranData}{str(time)}'.encode(encoding='UTF-8', errors='strict')
             hash = hashlib.sha256(tmp).hexdigest()
         return difficulty, hash, nonce
@@ -174,18 +173,18 @@ class BlockChain:
             print("All Blocks are there")
             for result in self.results:
                 print(result[0].get_block())
-
+                print(result[1]*1000)
             #  下面对生成的区块进行筛选
 
             #  至少有一个的
             first=self.results[0][0]
             #  时间修改为十进制
-            mitime=Decimal(self.results[0][1])
+            mitime=(self.results[0][1])
 
             for i in range(1,len(self.results)):
                 if Decimal(self.results[i][1])<mitime:
                     first=self.results[i][0]
-                    mitime=Decimal(self.results[i][1])
+                    mitime=(self.results[i][1])
             self.chain.append(first)
             self.results=[]
 
@@ -206,3 +205,4 @@ if __name__=='__main__':
         chain.newblock()
     chain.showchain()
 
+# python在终止线程时可能会有bug  所以没有设计线程终止操作
